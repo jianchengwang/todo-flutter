@@ -7,6 +7,7 @@ import 'package:todolist/app/core/utils/extensions.dart';
 import 'package:todolist/app/modules/home/widgets/add_card.dart';
 import 'package:todolist/app/modules/home/widgets/add_dialog.dart';
 import 'package:todolist/app/modules/home/widgets/task_card.dart';
+import 'package:todolist/app/modules/report/view.dart';
 
 import '../../core/values/colors.dart';
 
@@ -17,19 +18,22 @@ class HomePage extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(4.0.wp),
-              child: Text(
-                'My List',
-                style:
-                    TextStyle(fontSize: 24.0.sp, fontWeight: FontWeight.bold),
-              ),
-            ),
-            Obx(
-                () => GridView.count(
+      body: Obx(() =>
+        IndexedStack(
+          index: controller.tabIndex.value,
+          children:[
+            SafeArea(
+            child: ListView(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(4.0.wp),
+                  child: Text(
+                    'My List',
+                    style:
+                        TextStyle(fontSize: 24.0.sp, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                GridView.count(
                   crossAxisCount: 2,
                   shrinkWrap: true,
                   physics: const ClampingScrollPhysics(),
@@ -50,8 +54,10 @@ class HomePage extends GetView<HomeController> {
                     AddCard()
                   ],
                 )
-            )
-          ],
+              ],
+            )),
+            ReportPage()
+          ]
         ),
       ),
       floatingActionButton: DragTarget<Task>(
@@ -74,6 +80,37 @@ class HomePage extends GetView<HomeController> {
           controller.deleteTask(task);
           EasyLoading.showSuccess('Delete Sucess');
         },
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: Theme(
+        data: ThemeData(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+        ),
+        child: Obx(
+            () => BottomNavigationBar(
+            onTap: (int index) => controller.changeTabIndex(index),
+            currentIndex: controller.tabIndex.value,
+            showUnselectedLabels: false,
+            showSelectedLabels: false,
+            items: [
+              BottomNavigationBarItem(
+                label: 'Home',
+                icon: Padding(
+                  padding: EdgeInsets.only(right: 15.0.wp),
+                  child: Icon(Icons.apps),
+                )
+              ),
+              BottomNavigationBarItem(
+                  label: 'Report',
+                  icon: Padding(
+                    padding: EdgeInsets.only(left: 15.0.wp),
+                    child: Icon(Icons.data_usage),
+                  )
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
